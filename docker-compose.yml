@@ -62,22 +62,12 @@ services:
       re_cluster:
         ipv4_address: 192.168.20.100
 
-  rest1:
+  rest:
     build:
       context: .
       dockerfile: $PWD/restapi/Dockerfile
-    container_name: rest1
-    ports:
-      - 8000
-    profiles: ["rest"]
-    networks:
-      - re_cluster
-
-  rest2:
-    build:
-      context: .
-      dockerfile: $PWD/restapi/Dockerfile
-    container_name: rest2
+    deploy:
+      replicas: 2
     ports:
       - 8000
     profiles: ["rest"]
