@@ -61,8 +61,10 @@ async def dispatch(client: Redis) -> None:
                     logger.info(f'{contact_key} queued')
                     await asyncio.sleep(uniform(0, 2))
         except Exception as err:
-            logger.error(err)
-
+            if str(err) != "Connection closed by server.":
+                logger.error(err)
+                raise err
+            
 if __name__ == '__main__':
     load_dotenv(override=True)
     client:Redis = aioredis.from_url(os.getenv('REDIS_URL'))
