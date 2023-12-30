@@ -13,7 +13,7 @@
 This is a demo of a contact center ACD application implemented with Redis.  Multiple skills and multi-skilled agents are supported.  Longest Available Agent (LAA) targeting is performed.
 
 ## Architecture <a name="architecture"></a>
-![architecture](./images/BasicACD_Arch_High.jpg)  
+![architecture](./images/BasicACD_Arch_Highv2.jpg)  
 
 ## Methodology <a name="methodology"></a>
 ### Redis Data Structures
@@ -34,6 +34,8 @@ A universal queue is implemented as a Redis Sorted Set.  The members of the set 
 
 ### Load Balancing
 HAProxy is used for load balancing all client connections.
+#### High Availability
+Two HAProxy instances are deployed in a HA configuration via keepalived (VRRP).  The VIP those instances share is 192.168.20.100.
 #### Rest API Server Connections - Port 8000
 - HTTP round-robin load balancing across 2 servers
 - Dynamic scaling/Docker replica support via DNS and server-template
@@ -55,6 +57,7 @@ HAProxy is used for load balancing all client connections.
 - Redis-py dispatcher application for monitoring the ACD queue and assigning agents to contacts
 - Python simulator application for generating contacts into the ACD via REST API operations
 - HAProxy Load Balancing of all Redis and HTTP connections 
+- VRRP redundancy of HAProxy instances via keepalived
 
 ## Prerequisites <a name="prerequisites"></a>
 - Docker
