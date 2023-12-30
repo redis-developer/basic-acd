@@ -6,8 +6,6 @@ then
     rm server.key server.crt
 fi
 
-export PEM=$PWD/server.pem
-
 docker compose --profile redis up -d
 
 echo "*** Wait till Redis comes up ***"
