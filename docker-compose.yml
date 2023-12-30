@@ -1,0 +1,103 @@
+services:
+  re1:
+    image: redislabs/redis:latest
+    container_name: re1
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    ports:
+      - 8443
+      - 9443
+      - 12000
+    profiles: ["redis"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.2
+
+  re2:
+    image: redislabs/redis:latest
+    container_name: re2
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    ports:
+      - 8443
+      - 9443
+      - 12000
+    profiles: ["redis"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.3
+
+  re3:
+    image: redislabs/redis:latest
+    container_name: re3
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    ports:
+      - 8443
+      - 9443
+      - 12000
+    profiles: ["redis"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.4
+
+  loadbalancer:
+    image: haproxy:latest
+    ports: 
+      - "8000:8000"
+      - "8443:8443"
+      - "9443:9443"
+      - "12000:12000"
+    profiles: ["loadbalancer"]
+    volumes: 
+      - $PWD/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - $PWD/haproxy/server.pem:/usr/local/etc/haproxy/server.pem
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.100
+
+  rest1:
+    build:
+      context: .
+      dockerfile: $PWD/restapi/Dockerfile
+    container_name: rest1
+    ports:
+      - 8000
+    profiles: ["rest"]
+    networks:
+      - re_cluster
+
+  rest2:
+    build:
+      context: .
+      dockerfile: $PWD/restapi/Dockerfile
+    container_name: rest2
+    ports:
+      - 8000
+    profiles: ["rest"]
+    networks:
+      - re_cluster
+
+  dispatcher:
+    build:
+      context: .
+      dockerfile: $PWD/dispatcher/Dockerfile
+    profiles: ["dispatcher"]
+    deploy:
+      replicas: 2
+    networks:
+      - re_cluster
+  
+networks:
+  re_cluster:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.20.0/24

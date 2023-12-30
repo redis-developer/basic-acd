@@ -1,0 +1,1 @@
+docker compose --profile redis --profile rest --profile dispatcher --profile loadbalancer down
